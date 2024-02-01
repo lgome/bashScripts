@@ -1,0 +1,8 @@
+echo "test" | mail -s "test2" lgomez@aligntech.com
+
+smtp.office365.com
+
+root@PPRCR1TREATVM01.cr.aligntech.com
+
+sendemail -f root@PPRCR1TREATVM01.cr.aligntech.com -t lgomez@aligntech.com -s smtp.office365.com:587 -u \
+"Asunto" -m "Cuerpo del mensaje" -a archivoadjunto -v -xu lgomez-admin@aligntech -xp La8583*/ -o tls=auto

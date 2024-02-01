@@ -1,0 +1,28 @@
+
+LOG=/tmp/ltrestart.log
+touch $LOG
+TIME=$(date "+%Y.%m.%d-%H.%M.%S")
+NEW_LOG=$LOG.$TIME.log
+echo $(date) "restarting LT" >>$NEW_LOG
+sudo sh /etc/init.d/LTRestart.sh >>$NEW_LOG
+wait 10 >>$NEW_LOG
+if [pgrep -f activemq | wc -l > 0]
+  then
+	echo $(date) "activemq restarted" >>$NEW_LOG
+  else
+	echo $(date) "activemq not running, please check and restart LT manually" >>$NEW_LOG
+fi
+if [pgrep -f runLoader | wc -l > 0]
+  then
+	echo $(date) "runLoader restarted" >>$NEW_LOG
+  else
+	echo $(date) "runLoader not running, please check and restart LT manually" >>$NEW_LOG
+fi
+if [pgrep -f LiveTransfer | wc -l > 0]
+  then
+	echo $(date) "LiveTransfer restarted" >>$NEW_LOG
+  else
+	echo $(date) "LiveTransfer not running, please check and restart LT manually" >>$NEW_LOG
+fi
+
+echo $(date) "LT restarted" >>$NEW_LOG

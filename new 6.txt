@@ -1,0 +1,21 @@
+#!/bin/bash
+set -e
+
+FILE=/home/lgomez/scripts/AutoDDT.log
+cd /tmp
+
+if test -f "$FILE"; then
+ 
+ echo $(date) "activating more instances of AutoDDT SOS" > x.log
+ cd /etc/init.d
+ sleep 3
+ for i in runSosTPCOMPUTE_AutoDDTReq[1-5,22]; do service ${i} start; done
+	echo $(date) "instances ${i} are up and running" >> x.log
+ sleep 1800
+for i in runSosTPCOMPUTE_AutoDDTReq[1-5,22]; do service ${i} stop; done
+	echo $(date) "instances ${i} are down" >> x.log
+ sleep 2
+	exit 0
+	else $(date) "unable to start more AutoDDT instances" >> x.log
+	exit 11
+ fi

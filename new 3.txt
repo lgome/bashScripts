@@ -1,0 +1,25 @@
+SELECT TOP (1) [Operation]
+      ,[Datetime]
+      ,[CurrentCases]
+  FROM [Monitor].[dbo].[v_dataintelligence_openedcases]
+  where Operation = 'AUTO DDT'
+  order by DATETIME DESC
+
+
+@ligner123@ligner123
+
+
+#!/bin/bash
+
+#tamaño maximo en bytes: 100MB
+maxsize=100000000
+#por cada log si sobrepasa el tamaño maximo
+#entonces traer las ultimas 40000 lineas del log y borrar el resto
+for i in /opt/jboss-eap-5.2/jboss-as/server/all/log/server.* ;
+do 
+if [[ $( stat -c%s ${i} ) -gt $maxsize ]] 
+then
+tail -40000 ${i} > x.log
+rm -rf ${i} && mv x.log ${i}
+fi
+done

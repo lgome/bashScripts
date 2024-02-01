@@ -1,0 +1,108 @@
+/***************************************************************************\
+:* Server name: PRDUS2MESAPP11                                             *:
+:* Purpose: Linux Jboss Server                                             *:
+:* Running processes:                                                      *:
+:*   - ActiveMQ Broker                                                     *:
+:*   - jboss EAP 5.2                                                       *:
+:* Scripts for maintenance:                                                *:
+:*    /etc/init.d                                                          *:
+:*    /opt/jboss-eap-5.2/jboss-as/bin/                                     *:
+:* Service maintenance commands:                                           *:
+:* -Stop: "service activemq stop"; "service jboss stop"                    *:
+:* -Start: "service activemq start"; "service jboss start"                 *:
+:* -Restart: "service activemq restart"; "service jboss restart";          *:
+:*          "sh RestartJboss.sh"                                           *:
+:* Log files:                                                              *:
+:*    /opt/jboss-eap-5.2/jboss-as/jboss.log                                *:
+:* Wiki:                                                                   *:
+:*                                                                         *:
+\***************************************************************************/
+
+
+
+/************************************************************************************\
+:* Server name: PRDUS2MESIDS02                                                      *:
+:* Purpose: TPFORGE_ClinCheckEvent, ScanSeg and Response, TPFORGE_ClinCheckEvent,   *:
+:*    Auto DDT Req and Resp                                                         *:
+:* Running processes:                                                               *:
+:* - runSosTPCOMPUTE_AutoDDTResp                                                    *:
+:* - runSosTPFORGE_CCEventPublisher                                                 *:
+:* - runSosTPCOMPUTE_AutoDDTReq                                                     *:
+:* - runSosTPFORGE_ClinCheckEvent_CN                                                *:
+:* - runSosScanSegReq                                                               *:
+:* - runSosScanSegResp                                                              *:
+:* - runSosTPFORGE_ClinCheckEvent                                                   *:
+:* Scripts for maintenance:                                                         *:
+:*   /etc/init.d                                                                    *:
+:*   /u01/                                                                          *:
+:* Service maintenance commands:          		                                    *:
+:* -Stop: "service <running process> stop"  					                    *:
+:* -Start: "service <running process> start"   						                *:
+:* -Restart: "service <running process> restart"; 	   					            *:
+:* Log files:                                                                       *:
+:*   /u01/SosScanSegReq2/logs/wrapper.log                                           *:
+:*   /u01/SosScanSegResp/logs/wrapper.log                                           *:
+:*   /u01/SosTPCOMPUTE_AutoDDTReq/logs/wrapper.log                                  *:
+:*   /u01/SosTPCOMPUTE_AutoDDTResp/logs/wrapper.log                                 *:
+:*   /u01/SosTPFORGE_CCEventPublisher/logs/wrapper.log                              *:
+:*   /u01/TPFORGE_ClinCheckEvent/logs/wrapper.log                                   *:
+:*   /u01/TPFORGE_ClinCheckEvent_CN/logs/wrapper.log                                *:
+:* Wiki:                                                                            *:
+:*                                                                                  *:
+*************************************************************************************/
+
+
+:*   /opt/apache-activemq-5.8.0/data                                  *:
+
+:*   /opt/apache-activemq-5.8.0/data/wrapper.log                           *:
+
+
+:* Service maintenance commands:                                           *:
+:* -Stop: "service activemq stop"; "service jboss stop"                    *:
+:* -Start: "service activemq start"; "service jboss start"                 *:
+:* -Restart: "service activemq restart"; "service jboss restart";          *:
+
+
+/u01/ftpc9/jboss-eap-7.0/standalone/log/MESService.log
+/u01/ftpc9/jboss-eap-7.0/standalone/log/server.log
+
+/************************************************************************************\
+:* Server name: PRDUS2MESREST02                                                     *:
+:* Purpose: WS Mes Rest                                                             *:
+:* Running processes:                                                               *:
+:* - jboss                                                                          *:
+:* Scripts for maintenance:                                                         *:
+:*   /etc/init.d                                                                    *:
+:* Log files:                                                                       *:
+:*   /u01/ftpc9/jboss-eap-7.0/standalone/log/MESService.log                         *:
+:*   /u01/ftpc9/jboss-eap-7.0/standalone/log/server.log                             *:
+:* Wiki:                                                                            *:
+:*                                                                                  *:
+*************************************************************************************/
+
+
+
+/******************************************************************\
+:* Server name: PPRCRTREATVM01									  *:
+:* Purpose: Test												  *:
+:*																  *:
+:*																  *:
+:*																  *:
+:*																  *:
+\******************************************************************/
+
+a futuro introducir alias
+
+falta introducir ReClinCheck_CN en banner IDS02
+Inlcuir msj "this is an SOS server" en los banners
+
+
+mesapp08 activemq?
+
+mesweb05,06 run.sh no esta corriendo, enviar correo a Alberto con copia a Julio 
+
+
+
+ssh lgomez-admin@aligntech@10.107.20.12
+
+ 

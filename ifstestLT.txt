@@ -1,0 +1,38 @@
+#!/bin/bash
+
+set -e
+FILE=/tmp/test.log
+
+if test -f $FILE
+then
+ echo $(date) "restarting LT" > /tmp/x.log
+ runLoader=$(ps -eaf | grep -i runLoader | grep -iv 'grep' | wc -l)
+ LiveTransfer=$(ps -eaf | grep -i LiveTransfer | grep -iv 'grep' | wc -l)
+ activemq=$(ps -eaf | grep -i activemq | grep -iv 'grep' | wc -l)
+ PIDrunLoader=$(pgrep -f runLoader)
+ PIDLiveTransfer=$(pgrep -f LiveTransfer)
+ PIDactivemq=$(pgrep -f activemq)
+ ps -ef | grep LiveTransfer >> /tmp/x.log
+ if [ $runLoader -ge 1 ]
+  then
+        echo $(date) "runLoader is up, with PID " $PIDrunLoader >> /tmp/x.log
+        else $(date) "runLoader is not running" >> /tmp/x.log
+ fi
+ if [ $LiveTransfer -ge 1 ]
+  then
+        echo $(date) "LiveTransfer is up, with PID "  $PIDLiveTransfer >> /tmp/x.log
+        else $(date) "LiveTransfer is not running" >> /tmp/x.log
+ fi
+ if [ $activemq -ge 1 ]
+  then
+        echo $(date) "activemq is up, with PID "  $PIDactivemq >> /tmp/x.log
+        else $(date) "activemq is not running" >> /tmp/x.log
+ fi
+ sleep 10
+ echo test | mailx -s "LT has been restarted, please check attached log to confirm everything went OK" -a  /tmp/x.log treatopsappsupport@aligntech.com
+ sleep 15
+ rm -rf /tmp/x.log
+ rm -rf /tmp/ll.log
+fi
+
+
