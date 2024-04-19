@@ -1,1 +1,2 @@
 sudo yum install -y java
+wget https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/ShopOperationsServerLinux.zip
