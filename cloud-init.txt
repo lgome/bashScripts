@@ -1,3 +1,4 @@
 #!/bin/bash
 sudo yum install -y java
+sudo yum install -y mysql-server
 wget -O /tmp/a.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/ShopOperationsServerLinux.zip?sp=r&st=2024-04-20T03:15:22Z&se=2024-04-20T11:15:22Z&spr=https&sv=2022-11-02&sr=b&sig=W5K2hdqq46V%2BY%2BwGSIZ04inC0KD5Hs3nQwtY6xLmOdg%3D"
