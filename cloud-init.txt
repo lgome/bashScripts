@@ -1,4 +1,249 @@
 #!/bin/bash
-sudo yum install -y java
-sudo yum install -y mysql-server
-wget -O /tmp/a.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/ShopOperationsServerLinux.zip?sp=r&st=2024-04-20T03:15:22Z&se=2024-04-20T11:15:22Z&spr=https&sv=2022-11-02&sr=b&sig=W5K2hdqq46V%2BY%2BwGSIZ04inC0KD5Hs3nQwtY6xLmOdg%3D"
+#sudo yum install -y java
+#sudo yum install -y mysql-server
+wget -O /tmp/ShopOperationsServerLinux.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/ShopOperationsServerLinux.zip?sp=r&st=2024-04-20T03:15:22Z&se=2024-04-20T11:15:22Z&spr=https&sv=2022-11-02&sr=b&sig=W5K2hdqq46V%2BY%2BwGSIZ04inC0KD5Hs3nQwtY6xLmOdg%3D"
+
+# Install splunk
+echo "Install splunk forwarder" | sudo tee /dev/kmsg
+aws s3 cp s3://dedicated-align-env-sqa1-mes/splunkforwarder-8.2.5-77015bc7a462-Linux-x86_64.tgz /tmp/splunk_uf.tar.gz --quiet
+tar -xzf /tmp/splunk_uf.tar.gz -C /opt
+
+/opt/splunkforwarder/bin/splunk start --accept-license --answer-yes --no-prompt --seed-passwd B5qHUEZvae
+
+cat > /opt/splunkforwarder/etc/system/local/deploymentclient.conf <<EOF
+[target-broker:deploymentServer]
+targetUri = 10.16.243.216:8089
+EOF
+
+cat > /opt/splunkforwarder/etc/system/local/inputs.conf <<EOF
+[default]
+host = ${node_hostname}
+index = sqa1
+
+[monitor:///opt/ShopOperations*/logs/*.json]
+sourcetype = ftpc_shopops_server
+crcSalt = <SOURCE>
+
+[monitor:///opt/jbossas/jboss-as/*.log]
+sourcetype = generic_single_line
+crcSalt = <SOURCE>
+
+[monitor:///opt/ftpc10/jboss-eap-7.0/standalone/log/*.log]
+sourcetype = jboss
+crcSalt = <SOURCE>
+
+[monitor:///opt/tomcat/logs/*.log]
+sourcetype = generic_single_line
+crcSalt = <SOURCE>
+
+[monitor:///opt/ShopOperations*/logs/wrapper.log]
+sourcetype = ftpc_shopops_server
+crcSalt = <SOURCE>
+
+[monitor:///opt/ShopOperations*/logs/*.log]
+sourcetype = ftpc_shopops_app
+crcSalt = <SOURCE>
+blacklist = wrapper.log
+
+[monitor:///opt/ShopOperations*/bin/logs/*.xml]
+sourcetype = ftpc_shopops_xml
+crcSalt = <SOURCE>
+
+[monitor:///opt/ShopOperations*/logs/*.log]
+sourcetype = mescorp:sos
+EOF
+
+mkdir /opt/ftpc
+echo "Install yum packages" | sudo tee /dev/kmsg
+yum install -y glibc.i686
+
+MES_CORP_HOST=${MES_CORP_HOST:-mes-corp.sqa1-mes.misa.aligntech.com}  #need to update with the Jboss application server
+
+# Create all the shopops servers
+ports=(8030 8031 8032 8033 8034 8035 8036 8037 8038 8045 8040 8041 8042 8134 8200 8065 8205 8060 8201 8070 8210 8220 8221 8225 8230 8235 8240 8245 8250 8255 8260 8265 8120 8125 8241 8246)
+stations=(Scan\ Upload\ MX Admin1 Admin1 Admin1 Admin1 Admin1 Pre-MTP\ TFU Pre-STP\ TFU STP Admin1 Auto\ Segmentation Pre-IPL\ TFU IPL Admin1 Admin1\ ScanSegReq Admin1 Admin1 \ ScanSegResp Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1)
+eventsheets=(ACS_ScanUpload ACS_AssetValidation ACS_AssetReplication ACS_TreatUpload AT_MESEventPublisher AT_ACS_Asset_Purge_Event ACS_PreMTPTreatUpload ACS_PreSTPTreatUpload AT_TPS_STPEvent AT_EIG_CORP_WO_Download AT_IOS_AutoSegmentationEvent ACS_PreIPLTreatUpload AT_TPS_IPLEvent AT_MESEventPublisher_IDS AT_TPFORGE_ClinCheckEvent AT_SMARTDDT_ScanSegReq AT_SMARTDDT_ScanSegResp AT_CQA AT_TPFORGE_ClinCheckEvent_CN AT_TPCOMPUTE_AutoDDTReq AT_TPCOMPUTE_AutoDDTResp AT_SUB_TPS_TPSEvent_CN AT_SUB_TPS_TPSEvent AT_CSA_Produce AT_CSA_Response ACS_Tagging AT_SA_PostSnSReq AT_SA_PostSnSResp AT_CQ_OrderStop_Subscription AT_CQ_OrderStop_Release AT_Translation_Producer AT_Translation_Consumer AT_PreTreat_Produce AT_PreTreat_Response AT_SA_PostSnSReq_CN AT_SA_PostSnSResp_CN)
+xmx=$(( $(/bin/free -m | grep Mem | awk '{print $2}')/${#ports[@]} ))
+echo "Setting RAM to $xmx"+
+
+# Copy installation binaries
+echo "Download and unpuck zip archives from s3"
+aws s3 cp s3://dedicated-align-env-sqa1-mes/shopops_binaries/ShopOperationsServerLinux.zip /opt/ftpc
+aws s3 cp s3://dedicated-align-env-sqa1-mes/third_party_tools/installAPP.zip /tmp/
+
+# Install Java
+echo "Install java" | sudo tee /dev/kmsg
+cd /tmp
+unzip installAPP.zip
+rm -fr installAPP.zip
+mkdir -p /usr/java
+cp /tmp/installAPP/jdk-8u144-linux-x64.tar.gz /usr/java/
+tar xvf /usr/java/jdk-8u144-linux-x64.tar.gz -C /usr/java/
+rm -fr /usr/java/jdk-8u144-linux-x64.tar.gz
+echo "export JAVA_HOME=/usr/java/jdk1.8.0_144/jre" >> /root/.bashrc
+echo "export PATH=$JAVA_HOME/bin:$PATH" >> /root/.bashrc
+source /root/.bashrc
+
+for i in $(seq 0 $(( ${#ports[@]} - 1 )));
+do
+    # Unzip to a temporary directory and move contents
+    temp_dir="/tmp/ShopOperationsServer_${ports[$i]}"
+    mkdir -p "$temp_dir"
+    unzip -o /opt/ftpc/ShopOperationsServerLinux.zip -d "$temp_dir" > /dev/null
+    mkdir -p "/opt/ShopOperationsServer_${ports[$i]}"
+    mv "$temp_dir"/* "/opt/ShopOperationsServer_${ports[$i]}" > /dev/null
+    rm -rf "$temp_dir"
+    file=/opt/ShopOperationsServer_"${ports[$i]}"/bin/ShopOperationsServer.xml
+    wrapperconf=/opt/ShopOperationsServer_"${ports[$i]}"/conf/wrapper.conf
+    sed -i -e s/runSos/sos-"${ports[$i]}"/ /opt/ShopOperationsServer_"${ports[$i]}"/bin/runSos.sh
+    sed -i -e s/Rockwell\ Shop\ Operations\ Server/"${eventsheets[$i]}"/ /opt/ShopOperationsServer_"${ports[$i]}"/bin/runSos.sh
+    sed -i -e s/8084/"${ports[$i]}"/ "$file"
+    sed -i -e "s,\(</shop-operations-server-configuration>\),<station>${stations[$i]}</station>\1," "$file"
+    sed -i -e "s,\(</shop-operations-server-configuration>\),<event-sheet-name>${eventsheets[$i]}</event-sheet-name>\1," "$file"
+    sed -i -e "s,\(</shop-operations-server-configuration>\),<log-folder>/opt/ShopOperationsServer_${ports[$i]}/bin/logs</log-folder>\1," $file
+    cd /opt/ShopOperationsServer_"${ports[$i]}"/ && \
+    chmod 755 bin/configSosEnv.sh bin/runSos.sh bin/wrapper && \
+    sed -i -e "s/@@IIOP_URL@@/remote:\/\/${MES_CORP_HOST}:8080/" "$file" && \
+    sed -i -e "s/@@HTTP_URL@@/http:\/\/${MES_CORP_HOST}:8080/" "$file" && \
+    sed -i -e "s/Xmx512m/Xmx${xmx}m/" "$wrapperconf" && \
+    rm -rf /opt/ShopOperationsServer_"${ports[$i]}"/lib/slf4j-log4j12-1.7.15.jar
+    rm -rf /opt/ShopOperationsServer_"${ports[$i]}"/lib/activemq-all-5.15.0.jar
+    rm -rf /opt/ShopOperationsServer_"${ports[$i]}"/lib/slf4j-api-1.7.21.jar
+    cd /opt/ShopOperationsServer_"${ports[$i]}"/bin
+    sed -i -e 's/\r$//' runSos.sh
+    echo "before cat line service"
+    cd /opt
+
+    cat <<-EOF > /etc/systemd/system/sos-"${ports[$i]}".service
+[Unit]
+Description=${eventsheets[$i]}
+After=syslog.target
+
+[Service]
+Type=forking
+ExecStart=/opt/ShopOperationsServer_${ports[$i]}/bin/runSos.sh start
+ExecStop=/opt/ShopOperationsServer_${ports[$i]}/bin/runSos.sh stop
+KillMode=control-group
+Environment=SYSTEMD_KILLMODE_WARNING=true
+Environment=JAVA_HOME=/usr/lib/jvm/java
+RemainAfterExit=no
+Restart=always
+RestartSec=5s
+PIDFile=/opt/ShopOperationsServer_${ports[$i]}/bin/sos-${ports[$i]}.pid
+
+[Install]
+WantedBy=multi-user.target
+
+EOF
+done
+
+sed -i "s/admin/av/g" /opt/ShopOperationsServer_8235/bin/ShopOperationsServer.xml
+sed -i "s/admin/av/g" /opt/ShopOperationsServer_8031/bin/ShopOperationsServer.xml
+
+# Copy wrapper conf from S3 for SOS 8134
+echo "Copy wrapper conf from S3 for SOS 8134" | sudo tee /dev/kmsg
+aws s3 cp s3://dedicated-align-env-sqa1-mes/wrapper.conf /opt/ftpc
+cp /opt/ftpc/wrapper.conf /opt/ShopOperationsServer_8134/conf
+
+# Add Jar for EIG
+echo "Unpuck SOS archive for 8045 and 8034" | sudo tee /dev/kmsg
+unzip -j /opt/ftpc/ShopOperationsServerLinux.zip "lib/activemq-all-5.15.0.jar" -d /opt/ShopOperationsServer_8045/lib/
+unzip -j /opt/ftpc/ShopOperationsServerLinux.zip "lib/activemq-all-5.15.0.jar" -d /opt/ShopOperationsServer_8034/lib/
+
+# Create target dir and fetch the jar from S3 bucket
+echo "Download and unpuck jaxb" | sudo tee /dev/kmsg
+mkdir -p /opt/ShopOperationsServer_8134/bin/logs/jars
+aws s3 cp s3://dedicated-align-env-sqa1-mes/jaxb_dependency.zip /opt/ftpc/
+unzip /opt/ftpc/jaxb_dependency.zip -d /opt/ShopOperationsServer_8134/bin/logs/jars/
+
+# Add the new classpath to the wrapper config
+echo "wrapper.java.classpath.5=/opt/ShopOperationsServer_8134/bin/logs/jars/jaxb_dependency/*.jar" >> /opt/ShopOperationsServer_8134/conf/wrapper.conf
+
+echo "Start sos" | sudo tee /dev/kmsg
+sudo systemctl daemon-reload
+
+for i in $(seq 0 $(( ${#ports[@]} - 1 )));
+do
+    sudo systemctl start sos-"${ports[$i]}".service
+done
+
+# Create script to manage all instances
+echo "Start sos bash script" | sudo tee /dev/kmsg
+cat <<EOF > /usr/local/bin/sos.sh
+#!/bin/bash
+ 
+# Operation is the first argument. Defaults to 'start'
+OPERATION=\${1:-start}
+for port in ${ports[@]};
+do
+    systemctl \${OPERATION} sos-\${port}
+done
+EOF
+
+chmod +x /usr/local/bin/sos.sh
+
+# Mount S3 bucket to access Gen2 files
+yum install -y epel-release
+yum install -y s3fs-fuse
+mkdir -p /mnt/s3fs
+# set iam_role=auto so it gets credentials from the IAM role
+echo "s3fs#dedicated-align-env-sqa1-mes /mnt/s3fs fuse _netdev,allow_other,iam_role=auto 0 0" >> /etc/fstab
+mount /mnt/s3fs
+
+# Create symlinks
+ln -s /mnt/s3fs/gen2/acs /scan
+ln -s /mnt/s3fs/gen2/acs_pid /scan_pid
+
+sudo cat <<EOF > /usr/local/bin/watchdog-sos.sh
+#!/bin/bash
+  
+# Loop forever
+while true; do
+    # Check each ShopOps server
+    for sos in ${ports[@]}; do
+        # Check whether the log has not been updated for at least 10 minutes
+        if [ -f /opt/ShopOperationsServer_\${sos}/logs/wrapper.log ]; then
+            if [[ \`echo \$((\$(date +%s) - \$(date +%s -r /opt/ShopOperationsServer_\${sos}/logs/wrapper.log)))\` -gt 600 ]]; then
+                # Check whether there is a connection error at the bottom of the log
+                if [ \`tail -n 40 /opt/ShopOperationsServer_\${sos}/logs/wrapper.log | grep 'SEVERE: ClientUtility not bound\|Could not obtain connection\|Shutdown base activity' | wc -l\` -gt 0 ]; then
+                    # Write to the log that we're restarting this service
+                    echo \`date\` "\${sos} is hung. restarting" >> /var/log/sos-watchdog.log
+                      
+                    # Restart the service
+                    systemctl restart sos-\${sos}
+                fi
+            fi
+        fi
+    done
+  
+    # Check every minute
+    sleep 60
+done
+EOF
+ 
+echo "Start SOS watchdog" | sudo tee /dev/kmsg
+chmod +x /usr/local/bin/watchdog-sos.sh
+cat <<-EOF > /etc/systemd/system/sos-watchdog.service
+[Unit]
+Description=SOS Watchdog
+After=syslog.target
+  
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/watchdog-sos.sh
+KillMode=process
+RemainAfterExit=no
+Restart=always
+RestartSec=5s
+  
+[Install]
+WantedBy=multi-user.target
+EOF
+# Reload all the startup scripts
+systemctl daemon-reload
+
+# Enable watchdog service
+systemctl enable sos-watchdog
+ 
+# Start sos-watchdog
+systemctl start sos-watchdog
