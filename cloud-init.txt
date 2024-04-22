@@ -76,8 +76,8 @@ unzip /opt/installApp.zip -d /opt/installApp
 # Install Java
 echo "Install java" | sudo tee /dev/kmsg
 cd /opt
-unzip installAPP.zip
-rm -fr installAPP.zip
+#unzip installAPP.zip
+#rm -fr installAPP.zip
 mkdir -p /usr/java
 cp /opt/installApp/jdk-8u144-linux-x64.tar.gz /usr/java/
 tar xvf /usr/java/jdk-8u144-linux-x64.tar.gz -C /usr/java/
