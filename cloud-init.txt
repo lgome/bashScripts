@@ -10,7 +10,7 @@ sleep 120
 echo "Install splunk forwarder" | sudo tee /dev/kmsg
 wget -O /opt/splunkforwarder.tar.gz "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/splunkforwarder-8.2.5-77015bc7a462-Linux-x86_64.tgz?sp=r&st=2024-04-22T18:34:33Z&se=2024-05-23T02:34:33Z&spr=https&sv=2022-11-02&sr=b&sig=bovLDFwLQtPX7rrIqexOK2WfYciRKKNB11FaAF69qjg%3D"
 tar -xzf /opt/splunkforwarder.tar.gz -C /opt
-
+sleep 10
 /opt/splunkforwarder/bin/splunk start --accept-license --answer-yes --no-prompt --seed-passwd B5qHUEZvae
 
 cat > /opt/splunkforwarder/etc/system/local/deploymentclient.conf <<EOF
@@ -71,7 +71,7 @@ echo "Setting RAM to $xmx"+
 
 # Copy installation binaries
 
-unzip /opt/ShopOperationsServerLinux.zip -d /opt/ftpc/ShopOperationsServer_
+unzip /opt/ShopOperationsServerLinux.zip -d /opt/ShopOperationsServer_
 unzip /opt/installApp.zip -d /opt/installApp
 
 # Install Java
@@ -92,7 +92,7 @@ do
     # Unzip to a temporary directory and move contents
     temp_dir="/tmp/ShopOperationsServer_${ports[$i]}"
     mkdir -p "$temp_dir"
-    unzip -o /opt/ftpc/ShopOperationsServerLinux.zip -d "$temp_dir" > /dev/null
+    unzip -o /opt/ShopOperationsServerLinux.zip -d "$temp_dir" > /dev/null
     mkdir -p "/opt/ShopOperationsServer_${ports[$i]}"
     mv "$temp_dir"/* "/opt/ShopOperationsServer_${ports[$i]}" > /dev/null
     rm -rf "$temp_dir"
