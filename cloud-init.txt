@@ -142,18 +142,18 @@ sed -i "s/admin/av/g" /opt/ShopOperationsServer_8031/bin/ShopOperationsServer.xm
 
 # Copy wrapper conf from S3 for SOS 8134
 echo "Copy wrapper conf from S3 for SOS 8134" | sudo tee /dev/kmsg
-aws s3 cp s3://dedicated-align-env-sqa1-mes/wrapper.conf /opt/ftpc
+wget -O /opt/ftpc/wrapper.conf "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/wrapper.conf?sp=r&st=2024-04-22T19:10:01Z&se=2024-05-23T03:10:01Z&spr=https&sv=2022-11-02&sr=b&sig=gm%2FAHtoTF42Sax7VOUxy1i1q6wxFbcMFOVCxvfq1XxY%3D"
 cp /opt/ftpc/wrapper.conf /opt/ShopOperationsServer_8134/conf
 
 # Add Jar for EIG
 echo "Unpuck SOS archive for 8045 and 8034" | sudo tee /dev/kmsg
-unzip -j /opt/ftpc/ShopOperationsServerLinux.zip "lib/activemq-all-5.15.0.jar" -d /opt/ShopOperationsServer_8045/lib/
-unzip -j /opt/ftpc/ShopOperationsServerLinux.zip "lib/activemq-all-5.15.0.jar" -d /opt/ShopOperationsServer_8034/lib/
+unzip -j /tmp/ShopOperationsServerLinux.zip "lib/activemq-all-5.15.0.jar" -d /opt/ShopOperationsServer_8045/lib/
+unzip -j /tmp/ShopOperationsServerLinux.zip "lib/activemq-all-5.15.0.jar" -d /opt/ShopOperationsServer_8034/lib/
 
 # Create target dir and fetch the jar from S3 bucket
 echo "Download and unpuck jaxb" | sudo tee /dev/kmsg
 mkdir -p /opt/ShopOperationsServer_8134/bin/logs/jars
-aws s3 cp s3://dedicated-align-env-sqa1-mes/jaxb_dependency.zip /opt/ftpc/
+wget -O /opt/ftpc "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/jaxb_dependency.zip?sp=r&st=2024-04-22T19:07:51Z&se=2024-05-23T03:07:51Z&spr=https&sv=2022-11-02&sr=b&sig=tUEErWiXixtykusckEqEiWfUCAXVb3oxszH3V3cq61Q%3D"
 unzip /opt/ftpc/jaxb_dependency.zip -d /opt/ShopOperationsServer_8134/bin/logs/jars/
 
 # Add the new classpath to the wrapper config
