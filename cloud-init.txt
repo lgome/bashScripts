@@ -67,9 +67,9 @@ xmx=$(( $(/bin/free -m | grep Mem | awk '{print $2}')/${#ports[@]} ))
 echo "Setting RAM to $xmx"+
 
 # Copy installation binaries
-echo "Download and unpuck zip archives from s3"
-unzip /tmp/ShopOperationsServerLinux.zip /opt/ftpc/ShopOperationsServer_
-unzip /tmp/installApp.zip /tmp/installApp
+
+unzip /tmp/ShopOperationsServerLinux.zip -d /opt/ftpc/ShopOperationsServer_
+unzip /tmp/installApp.zip -d /tmp/installApp
 
 # Install Java
 echo "Install java" | sudo tee /dev/kmsg
