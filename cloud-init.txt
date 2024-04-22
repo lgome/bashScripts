@@ -149,8 +149,8 @@ cp /opt/ftpc/wrapper.conf /opt/ShopOperationsServer_8134/conf
 
 # Add Jar for EIG
 echo "Unpuck SOS archive for 8045 and 8034" | sudo tee /dev/kmsg
-unzip -j /tmp/ShopOperationsServerLinux.zip "lib/activemq-all-5.15.0.jar" -d /opt/ShopOperationsServer_8045/lib/
-unzip -j /tmp/ShopOperationsServerLinux.zip "lib/activemq-all-5.15.0.jar" -d /opt/ShopOperationsServer_8034/lib/
+unzip -j /opt/ShopOperationsServerLinux.zip "lib/activemq-all-5.15.0.jar" -d /opt/ShopOperationsServer_8045/lib/
+unzip -j /opt/ShopOperationsServerLinux.zip "lib/activemq-all-5.15.0.jar" -d /opt/ShopOperationsServer_8034/lib/
 
 # Create target dir and fetch the jar from S3 bucket
 echo "Download and unpuck jaxb" | sudo tee /dev/kmsg
