@@ -71,8 +71,10 @@ echo "Setting RAM to $xmx"+
 
 # Copy installation binaries
 
-unzip /opt/ShopOperationsServerLinux.zip -d /opt/ShopOperationsServer_
+unzip /opt/ShopOperationsServerLinux.zip -d /opt/ShopOperationsServer_ 
+rm -rf /opt/ShopOperationsServerLinux.zip
 unzip /opt/installApp.zip -d /opt/installApp
+rm -rf /opt/installApp.zip
 
 # Install Java
 echo "Install java" | sudo tee /dev/kmsg
