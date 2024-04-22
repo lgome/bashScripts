@@ -2,13 +2,13 @@
 #sudo yum install -y java
 #sudo yum install -y mysql-server
 sudo su -
-wget -O /tmp/ShopOperationsServerLinux.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/ShopOperationsServerLinux.zip?sp=r&st=2024-04-22T20:06:10Z&se=2024-05-23T04:06:10Z&spr=https&sv=2022-11-02&sr=b&sig=mxTzGCXcIgVsgl08BQB7MJU7SqoXI0RFPzGi28X6Ius%3D"
-wget -O /tmp/installApp.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/installAPP.zip?sp=r&st=2024-04-22T18:37:41Z&se=2024-04-23T02:37:41Z&spr=https&sv=2022-11-02&sr=b&sig=NQncxu5j2xI0NdhpRSLWSr8a%2B9g%2Fr%2B1iWFnjDlu%2B6C4%3D"
-wget -O /tmp/splunkforwarder.tar.gz "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/splunkforwarder-8.2.5-77015bc7a462-Linux-x86_64.tgz?sp=r&st=2024-04-22T18:34:33Z&se=2024-05-23T02:34:33Z&spr=https&sv=2022-11-02&sr=b&sig=bovLDFwLQtPX7rrIqexOK2WfYciRKKNB11FaAF69qjg%3D"
+wget -O /opt/ShopOperationsServerLinux.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/ShopOperationsServerLinux.zip?sp=r&st=2024-04-22T20:06:10Z&se=2024-05-23T04:06:10Z&spr=https&sv=2022-11-02&sr=b&sig=mxTzGCXcIgVsgl08BQB7MJU7SqoXI0RFPzGi28X6Ius%3D"
+wget -O /opt/installApp.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/installAPP.zip?sp=r&st=2024-04-22T20:23:33Z&se=2024-05-23T04:23:33Z&spr=https&sv=2022-11-02&sr=b&sig=eoat3R4iu0IgEa7ymqQ6xfLgkw8%2F1l9jae0K3r0uf0M%3D"
+
 # Install splunk
 echo "Install splunk forwarder" | sudo tee /dev/kmsg
-
-tar -xzf /tmp/splunkforwarder.tar.gz -C /opt
+wget -O /opt/splunkforwarder.tar.gz "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/splunkforwarder-8.2.5-77015bc7a462-Linux-x86_64.tgz?sp=r&st=2024-04-22T18:34:33Z&se=2024-05-23T02:34:33Z&spr=https&sv=2022-11-02&sr=b&sig=bovLDFwLQtPX7rrIqexOK2WfYciRKKNB11FaAF69qjg%3D"
+tar -xzf /opt/splunkforwarder.tar.gz -C /opt
 
 /opt/splunkforwarder/bin/splunk start --accept-license --answer-yes --no-prompt --seed-passwd B5qHUEZvae
 
@@ -70,16 +70,16 @@ echo "Setting RAM to $xmx"+
 
 # Copy installation binaries
 
-unzip /tmp/ShopOperationsServerLinux.zip -d /opt/ftpc/ShopOperationsServer_
-unzip /tmp/installApp.zip -d /tmp/installApp
+unzip /opt/ShopOperationsServerLinux.zip -d /opt/ftpc/ShopOperationsServer_
+unzip /opt/installApp.zip -d /opt/installApp
 
 # Install Java
 echo "Install java" | sudo tee /dev/kmsg
-cd /tmp
+cd /opt
 unzip installAPP.zip
 rm -fr installAPP.zip
 mkdir -p /usr/java
-cp /tmp/installAPP/jdk-8u144-linux-x64.tar.gz /usr/java/
+cp /opt/installApp/jdk-8u144-linux-x64.tar.gz /usr/java/
 tar xvf /usr/java/jdk-8u144-linux-x64.tar.gz -C /usr/java/
 rm -fr /usr/java/jdk-8u144-linux-x64.tar.gz
 echo "export JAVA_HOME=/usr/java/jdk1.8.0_144/jre" >> /root/.bashrc
@@ -155,7 +155,7 @@ unzip -j /tmp/ShopOperationsServerLinux.zip "lib/activemq-all-5.15.0.jar" -d /op
 # Create target dir and fetch the jar from S3 bucket
 echo "Download and unpuck jaxb" | sudo tee /dev/kmsg
 mkdir -p /opt/ShopOperationsServer_8134/bin/logs/jars
-wget -O /opt/ftpc "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/jaxb_dependency.zip?sp=r&st=2024-04-22T19:07:51Z&se=2024-05-23T03:07:51Z&spr=https&sv=2022-11-02&sr=b&sig=tUEErWiXixtykusckEqEiWfUCAXVb3oxszH3V3cq61Q%3D"
+wget -O /opt/ftpc/jaxb_dependency.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/jaxb_dependency.zip?sp=r&st=2024-04-22T19:07:51Z&se=2024-05-23T03:07:51Z&spr=https&sv=2022-11-02&sr=b&sig=tUEErWiXixtykusckEqEiWfUCAXVb3oxszH3V3cq61Q%3D"
 unzip /opt/ftpc/jaxb_dependency.zip -d /opt/ShopOperationsServer_8134/bin/logs/jars/
 
 # Add the new classpath to the wrapper config
