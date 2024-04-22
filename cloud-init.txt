@@ -248,3 +248,5 @@ systemctl enable sos-watchdog
  
 # Start sos-watchdog
 systemctl start sos-watchdog
+
+init 6
