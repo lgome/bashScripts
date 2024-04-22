@@ -1,6 +1,7 @@
 #!/bin/bash
 #sudo yum install -y java
 #sudo yum install -y mysql-server
+sudo su -
 wget -O /tmp/ShopOperationsServerLinux.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/ShopOperationsServerLinux.zip?sp=r&st=2024-04-20T03:15:22Z&se=2024-04-20T11:15:22Z&spr=https&sv=2022-11-02&sr=b&sig=W5K2hdqq46V%2BY%2BwGSIZ04inC0KD5Hs3nQwtY6xLmOdg%3D"
 wget -O /tmp/installApp.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/installAPP.zip?sp=r&st=2024-04-22T18:37:41Z&se=2024-04-23T02:37:41Z&spr=https&sv=2022-11-02&sr=b&sig=NQncxu5j2xI0NdhpRSLWSr8a%2B9g%2Fr%2B1iWFnjDlu%2B6C4%3D"
 wget -O /tmp/splunkforwarder.tar.gz "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/splunkforwarder-8.2.5-77015bc7a462-Linux-x86_64.tgz?sp=r&st=2024-04-22T18:34:33Z&se=2024-05-23T02:34:33Z&spr=https&sv=2022-11-02&sr=b&sig=bovLDFwLQtPX7rrIqexOK2WfYciRKKNB11FaAF69qjg%3D"
@@ -19,7 +20,7 @@ EOF
 cat > /opt/splunkforwarder/etc/system/local/inputs.conf <<EOF
 [default]
 host = ${node_hostname}
-index = sqa1
+index = dev
 
 [monitor:///opt/ShopOperations*/logs/*.json]
 sourcetype = ftpc_shopops_server
@@ -184,16 +185,16 @@ EOF
 chmod +x /usr/local/bin/sos.sh
 
 # Mount S3 bucket to access Gen2 files
-yum install -y epel-release
-yum install -y s3fs-fuse
-mkdir -p /mnt/s3fs
+#yum install -y epel-release
+#yum install -y s3fs-fuse
+#mkdir -p /mnt/s3fs
 # set iam_role=auto so it gets credentials from the IAM role
-echo "s3fs#dedicated-align-env-sqa1-mes /mnt/s3fs fuse _netdev,allow_other,iam_role=auto 0 0" >> /etc/fstab
-mount /mnt/s3fs
+#echo "s3fs#dedicated-align-env-sqa1-mes /mnt/s3fs fuse _netdev,allow_other,iam_role=auto 0 0" >> /etc/fstab
+#mount /mnt/s3fs
 
 # Create symlinks
-ln -s /mnt/s3fs/gen2/acs /scan
-ln -s /mnt/s3fs/gen2/acs_pid /scan_pid
+#ln -s /mnt/s3fs/gen2/acs /scan
+#ln -s /mnt/s3fs/gen2/acs_pid /scan_pid
 
 sudo cat <<EOF > /usr/local/bin/watchdog-sos.sh
 #!/bin/bash
