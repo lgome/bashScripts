@@ -2,15 +2,15 @@
 #sudo yum install -y java
 #sudo yum install -y mysql-server
 sudo su -
-wget -O /opt/ShopOperationsServerLinux.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/ShopOperationsServerLinux.zip?sp=r&st=2024-04-22T20:06:10Z&se=2024-05-23T04:06:10Z&spr=https&sv=2022-11-02&sr=b&sig=mxTzGCXcIgVsgl08BQB7MJU7SqoXI0RFPzGi28X6Ius%3D"
+wget -O /dev/shm/ShopOperationsServerLinux.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/ShopOperationsServerLinux.zip?sp=r&st=2024-04-22T20:06:10Z&se=2024-05-23T04:06:10Z&spr=https&sv=2022-11-02&sr=b&sig=mxTzGCXcIgVsgl08BQB7MJU7SqoXI0RFPzGi28X6Ius%3D"
 sleep 120
-wget -O /opt/installApp.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/installAPP.zip?sp=r&st=2024-04-22T21:14:52Z&se=2024-05-23T05:14:52Z&spr=https&sv=2022-11-02&sr=b&sig=PldqPu%2Baiq1qVAaq21MgpxutLT9wXrekfL%2Bf2X3jyP0%3D"
+wget -O /dev/shm/installApp.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/installAPP.zip?sp=r&st=2024-04-22T21:14:52Z&se=2024-05-23T05:14:52Z&spr=https&sv=2022-11-02&sr=b&sig=PldqPu%2Baiq1qVAaq21MgpxutLT9wXrekfL%2Bf2X3jyP0%3D"
 sleep 120
 # Install splunk
 echo "Install splunk forwarder" | sudo tee /dev/kmsg
-wget -O /opt/splunkforwarder.tar.gz "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/splunkforwarder-8.2.5-77015bc7a462-Linux-x86_64.tgz?sp=r&st=2024-04-22T18:34:33Z&se=2024-05-23T02:34:33Z&spr=https&sv=2022-11-02&sr=b&sig=bovLDFwLQtPX7rrIqexOK2WfYciRKKNB11FaAF69qjg%3D"
-tar -xzf /opt/splunkforwarder.tar.gz -C /opt
-rm -rf /opt/splunkforwarder.tar.gz
+wget -O /dev/shm/splunkforwarder.tar.gz "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/splunkforwarder-8.2.5-77015bc7a462-Linux-x86_64.tgz?sp=r&st=2024-04-22T18:34:33Z&se=2024-05-23T02:34:33Z&spr=https&sv=2022-11-02&sr=b&sig=bovLDFwLQtPX7rrIqexOK2WfYciRKKNB11FaAF69qjg%3D"
+tar -xzf /dev/shm/splunkforwarder.tar.gz -C /opt
+rm -rf /dev/shm/splunkforwarder.tar.gz
 sleep 10
 /opt/splunkforwarder/bin/splunk start --accept-license --answer-yes --no-prompt --seed-passwd B5qHUEZvae
 
@@ -64,7 +64,7 @@ yum install -y glibc.i686
 MES_CORP_HOST=${MES_CORP_HOST:-mes-corp.sqa1-mes.misa.aligntech.com}  #need to update with the Jboss application server
 
 # Create all the shopops servers
-ports=(8030 8031 8032 8033 8034 8035 8036 8037 8038 8045 8040 8041 8042 8134 8200 8065 8205 8060 8201 8070)
+ports=(8030 8031 8032 8033 8034 8035 8036 8037 8038 8045 8040 8041 8042 8134 8200 8065 8205 8060 8201 8070 8210 8220 8221 8225 8230 8235 8240 8245 8250 8255 8260 8265 8120 8125 8241 8246)
 stations=(Scan\ Upload\ MX Admin1 Admin1 Admin1 Admin1 Admin1 Pre-MTP\ TFU Pre-STP\ TFU STP Admin1 Auto\ Segmentation Pre-IPL\ TFU IPL Admin1 Admin1\ ScanSegReq Admin1 Admin1 \ ScanSegResp Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1)
 eventsheets=(ACS_ScanUpload ACS_AssetValidation ACS_AssetReplication ACS_TreatUpload AT_MESEventPublisher AT_ACS_Asset_Purge_Event ACS_PreMTPTreatUpload ACS_PreSTPTreatUpload AT_TPS_STPEvent AT_EIG_CORP_WO_Download AT_IOS_AutoSegmentationEvent ACS_PreIPLTreatUpload AT_TPS_IPLEvent AT_MESEventPublisher_IDS AT_TPFORGE_ClinCheckEvent AT_SMARTDDT_ScanSegReq AT_SMARTDDT_ScanSegResp AT_CQA AT_TPFORGE_ClinCheckEvent_CN AT_TPCOMPUTE_AutoDDTReq AT_TPCOMPUTE_AutoDDTResp AT_SUB_TPS_TPSEvent_CN AT_SUB_TPS_TPSEvent AT_CSA_Produce AT_CSA_Response ACS_Tagging AT_SA_PostSnSReq AT_SA_PostSnSResp AT_CQ_OrderStop_Subscription AT_CQ_OrderStop_Release AT_Translation_Producer AT_Translation_Consumer AT_PreTreat_Produce AT_PreTreat_Response AT_SA_PostSnSReq_CN AT_SA_PostSnSResp_CN)
 xmx=$(( $(/bin/free -m | grep Mem | awk '{print $2}')/${#ports[@]} ))
@@ -72,10 +72,10 @@ echo "Setting RAM to $xmx"+
 
 # Copy installation binaries
 
-unzip /opt/ShopOperationsServerLinux.zip -d /opt/ShopOperationsServer_ 
+unzip /dev/shm/ShopOperationsServerLinux.zip -d /opt/ShopOperationsServer_ 
 
-unzip /opt/installApp.zip -d /opt/installApp
-rm -rf /opt/installApp.zip
+unzip /dev/shm/installApp.zip -d /opt/installApp
+rm -rf /dev/shm/installApp.zip
 
 # Install Java
 echo "Install java" | sudo tee /dev/kmsg
@@ -96,8 +96,8 @@ do
     # Unzip to a temporary directory and move contents
     temp_dir="/tmp/ShopOperationsServer_${ports[$i]}"
     mkdir -p "$temp_dir"
-    unzip -o /opt/ShopOperationsServerLinux.zip -d "$temp_dir" > /dev/null
-    rm -rf /opt/ShopOperationsServerLinux.zip
+    unzip -o /dev/shm/ShopOperationsServerLinux.zip -d "$temp_dir" > /dev/null
+    #rm -rf /opt/ShopOperationsServerLinux.zip
     mkdir -p "/opt/ShopOperationsServer_${ports[$i]}"
     cp "$temp_dir"/* "/opt/ShopOperationsServer_${ports[$i]}" > /dev/null
     rm -rf "$temp_dir"
