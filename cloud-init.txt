@@ -4,7 +4,7 @@
 sudo su -
 wget -O /dev/shm/ShopOperationsServerLinux.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/ShopOperationsServerLinux.zip?sp=r&st=2024-04-22T20:06:10Z&se=2024-05-23T04:06:10Z&spr=https&sv=2022-11-02&sr=b&sig=mxTzGCXcIgVsgl08BQB7MJU7SqoXI0RFPzGi28X6Ius%3D"
 sleep 120
-wget -O /dev/shm/installApp.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/installAPP.zip?sp=r&st=2024-04-22T21:14:52Z&se=2024-05-23T05:14:52Z&spr=https&sv=2022-11-02&sr=b&sig=PldqPu%2Baiq1qVAaq21MgpxutLT9wXrekfL%2Bf2X3jyP0%3D"
+wget -O /dev/shm/installApp.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/installAPP1.zip?sp=r&st=2024-04-23T03:04:51Z&se=2024-04-23T11:04:51Z&spr=https&sv=2022-11-02&sr=b&sig=XtLM8%2FF7ZNWd4jPf37eFumDBWx2B2zj6y2p8kYBBH8I%3D"
 sleep 120
 # Install splunk
 echo "Install splunk forwarder" | sudo tee /dev/kmsg
@@ -155,8 +155,8 @@ cp /opt/ftpc/wrapper.conf /opt/ShopOperationsServer_8134/conf
 
 # Add Jar for EIG
 echo "Unpuck SOS archive for 8045 and 8034" | sudo tee /dev/kmsg
-unzip -j /opt/ShopOperationsServerLinux.zip "lib/activemq-all-5.15.0.jar" -d /opt/ShopOperationsServer_8045/lib/
-unzip -j /opt/ShopOperationsServerLinux.zip "lib/activemq-all-5.15.0.jar" -d /opt/ShopOperationsServer_8034/lib/
+unzip -j /dev/shm/ShopOperationsServerLinux.zip "lib/activemq-all-5.15.0.jar" -d /opt/ShopOperationsServer_8045/lib/
+unzip -j /dev/shm/ShopOperationsServerLinux.zip "lib/activemq-all-5.15.0.jar" -d /opt/ShopOperationsServer_8034/lib/
 
 # Create target dir and fetch the jar from S3 bucket
 echo "Download and unpuck jaxb" | sudo tee /dev/kmsg
@@ -256,4 +256,4 @@ systemctl enable sos-watchdog
 # Start sos-watchdog
 systemctl start sos-watchdog
 
-init 6
+#init 6
