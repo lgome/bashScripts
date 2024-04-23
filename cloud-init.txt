@@ -3,7 +3,7 @@
 #sudo yum install -y mysql-server
 sudo su -
 wget -O /dev/shm/ShopOperationsServerLinux.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/ShopOperationsServerLinux.zip?sp=r&st=2024-04-22T20:06:10Z&se=2024-05-23T04:06:10Z&spr=https&sv=2022-11-02&sr=b&sig=mxTzGCXcIgVsgl08BQB7MJU7SqoXI0RFPzGi28X6Ius%3D"
-sleep 120
+sleep 30
 wget -O /dev/shm/installApp.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/installAPP1.zip?sp=r&st=2024-04-23T03:04:51Z&se=2024-04-23T11:04:51Z&spr=https&sv=2022-11-02&sr=b&sig=XtLM8%2FF7ZNWd4jPf37eFumDBWx2B2zj6y2p8kYBBH8I%3D"
 sleep 120
 # Install splunk
