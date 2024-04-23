@@ -4,7 +4,7 @@
 sudo su -
 wget -O /dev/shm/ShopOperationsServerLinux.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/ShopOperationsServerLinux.zip?sp=r&st=2024-04-22T20:06:10Z&se=2024-05-23T04:06:10Z&spr=https&sv=2022-11-02&sr=b&sig=mxTzGCXcIgVsgl08BQB7MJU7SqoXI0RFPzGi28X6Ius%3D"
 sleep 30
-wget -O /dev/shm/installApp.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/installAPP1.zip?sp=r&st=2024-04-23T03:04:51Z&se=2024-04-23T11:04:51Z&spr=https&sv=2022-11-02&sr=b&sig=XtLM8%2FF7ZNWd4jPf37eFumDBWx2B2zj6y2p8kYBBH8I%3D"
+wget -O /dev/shm/installApp.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/installAPP.zip?sp=r&st=2024-04-23T03:18:05Z&se=2024-05-22T11:18:05Z&spr=https&sv=2022-11-02&sr=b&sig=zHecfGzWap0spfYDsjSeeCEFc7sEdBokUAJt4HGyh5M%3D"
 sleep 120
 # Install splunk
 echo "Install splunk forwarder" | sudo tee /dev/kmsg
@@ -75,7 +75,7 @@ echo "Setting RAM to $xmx"+
 unzip /dev/shm/ShopOperationsServerLinux.zip -d /opt/ShopOperationsServer_ 
 
 unzip /dev/shm/installApp.zip -d /opt/installApp
-rm -rf /dev/shm/installApp.zip
+#rm -rf /dev/shm/installApp.zip
 
 # Install Java
 echo "Install java" | sudo tee /dev/kmsg
