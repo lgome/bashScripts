@@ -64,9 +64,9 @@ yum install -y glibc.i686
 MES_CORP_HOST=${MES_CORP_HOST:-mes-corp.sqa1-mes.misa.aligntech.com}  #need to update with the Jboss application server
 
 # Create all the shopops servers
-ports=(8030 8031 8032 8033 8034 8035 8036 8037 8038 8045 8040 8041 8042 8134 8200 8065 8205 8060 8201 8070 8210 8220 8221 8225 8230 8235 8240 8245 8250 8255 8260 8265 8120 8125 8241 8246)
-stations=(Scan\ Upload\ MX Admin1 Admin1 Admin1 Admin1 Admin1 Pre-MTP\ TFU Pre-STP\ TFU STP Admin1 Auto\ Segmentation Pre-IPL\ TFU IPL Admin1 Admin1\ ScanSegReq Admin1 Admin1 \ ScanSegResp Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1)
-eventsheets=(ACS_ScanUpload ACS_AssetValidation ACS_AssetReplication ACS_TreatUpload AT_MESEventPublisher AT_ACS_Asset_Purge_Event ACS_PreMTPTreatUpload ACS_PreSTPTreatUpload AT_TPS_STPEvent AT_EIG_CORP_WO_Download AT_IOS_AutoSegmentationEvent ACS_PreIPLTreatUpload AT_TPS_IPLEvent AT_MESEventPublisher_IDS AT_TPFORGE_ClinCheckEvent AT_SMARTDDT_ScanSegReq AT_SMARTDDT_ScanSegResp AT_CQA AT_TPFORGE_ClinCheckEvent_CN AT_TPCOMPUTE_AutoDDTReq AT_TPCOMPUTE_AutoDDTResp AT_SUB_TPS_TPSEvent_CN AT_SUB_TPS_TPSEvent AT_CSA_Produce AT_CSA_Response ACS_Tagging AT_SA_PostSnSReq AT_SA_PostSnSResp AT_CQ_OrderStop_Subscription AT_CQ_OrderStop_Release AT_Translation_Producer AT_Translation_Consumer AT_PreTreat_Produce AT_PreTreat_Response AT_SA_PostSnSReq_CN AT_SA_PostSnSResp_CN)
+ports=(8030 8031 8032 8033 8034 )
+stations=(Scan\ Upload\ MX Admin1 Admin1 Admin1 Admin1)
+eventsheets=(ACS_ScanUpload ACS_AssetValidation ACS_AssetReplication ACS_TreatUpload AT_MESEventPublisher)
 xmx=$(( $(/bin/free -m | grep Mem | awk '{print $2}')/${#ports[@]} ))
 echo "Setting RAM to $xmx"+
 
