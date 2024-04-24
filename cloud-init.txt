@@ -96,7 +96,7 @@ do
     # Unzip to a temporary directory and move contents
     temp_dir="/tmp/ShopOperationsServer_${ports[$i]}"
     mkdir -p "$temp_dir"
-    cp -r /opt/ShopOperationsServer_ "$temp_dir" > /dev/null
+    cp -r /opt/ShopOperationsServer_/* "$temp_dir" > /dev/null
     
     mkdir -p "/opt/ShopOperationsServer_${ports[$i]}"
     cp -r "$temp_dir"/* "/opt/ShopOperationsServer_${ports[$i]}" > /dev/null
