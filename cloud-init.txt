@@ -3,9 +3,9 @@
 #sudo yum install -y mysql-server
 sudo su -
 wget -O /dev/shm/ShopOperationsServerLinux.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/ShopOperationsServerLinux.zip?sp=r&st=2024-04-22T20:06:10Z&se=2024-05-23T04:06:10Z&spr=https&sv=2022-11-02&sr=b&sig=mxTzGCXcIgVsgl08BQB7MJU7SqoXI0RFPzGi28X6Ius%3D"
-sleep 30
+sleep 10
 wget -O /dev/shm/installApp.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/installApp.zip?sp=r&st=2024-04-24T01:30:28Z&se=2024-05-24T09:30:28Z&spr=https&sv=2022-11-02&sr=b&sig=WX66Vw2Se5LKYbb%2B49LzffDM2sRV9cKJ6F0vo9UMd1k%3D"
-sleep 120
+sleep 30
 # Install splunk
 echo "Install splunk forwarder" | sudo tee /dev/kmsg
 wget -O /dev/shm/splunkforwarder.tar.gz "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/splunkforwarder-8.2.5-77015bc7a462-Linux-x86_64.tgz?sp=r&st=2024-04-22T18:34:33Z&se=2024-05-23T02:34:33Z&spr=https&sv=2022-11-02&sr=b&sig=bovLDFwLQtPX7rrIqexOK2WfYciRKKNB11FaAF69qjg%3D"
