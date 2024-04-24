@@ -2,6 +2,12 @@
 #sudo yum install -y java
 #sudo yum install -y mysql-server
 sudo su -
+lsblk -f
+sleep 5
+vgdisplay rootvg
+sleep 5
+lvresize -r -L +40G /dev/mapper/rootvg-rootlv
+sleep 10
 wget -O /dev/shm/ShopOperationsServerLinux.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/ShopOperationsServerLinux.zip?sp=r&st=2024-04-22T20:06:10Z&se=2024-05-23T04:06:10Z&spr=https&sv=2022-11-02&sr=b&sig=mxTzGCXcIgVsgl08BQB7MJU7SqoXI0RFPzGi28X6Ius%3D"
 sleep 10
 wget -O /dev/shm/installApp.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/installApp.zip?sp=r&st=2024-04-24T01:30:28Z&se=2024-05-24T09:30:28Z&spr=https&sv=2022-11-02&sr=b&sig=WX66Vw2Se5LKYbb%2B49LzffDM2sRV9cKJ6F0vo9UMd1k%3D"
