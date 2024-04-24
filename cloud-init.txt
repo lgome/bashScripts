@@ -104,7 +104,7 @@ do
     # Unzip to a temporary directory and move contents
     temp_dir="/tmp/ShopOperationsServer_${ports[$i]}"
     mkdir -p "$temp_dir"
-    unzip -o /opt/ftpc/ShopOperationsServerLinux.zip -d "$temp_dir" > /dev/null
+    unzip -o /opt/ShopOperationsServerLinux.zip -d "$temp_dir" > /dev/null
     mkdir -p "/opt/ShopOperationsServer_${ports[$i]}"
     mv "$temp_dir"/* "/opt/ShopOperationsServer_${ports[$i]}" > /dev/null
     #rm -rf "$temp_dir"
