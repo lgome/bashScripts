@@ -4,7 +4,7 @@
 sudo su -
 wget -O /dev/shm/ShopOperationsServerLinux.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/ShopOperationsServerLinux.zip?sp=r&st=2024-04-22T20:06:10Z&se=2024-05-23T04:06:10Z&spr=https&sv=2022-11-02&sr=b&sig=mxTzGCXcIgVsgl08BQB7MJU7SqoXI0RFPzGi28X6Ius%3D"
 sleep 30
-wget -O /dev/shm/installApp.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/installAPP.zip?sp=r&st=2024-04-23T03:18:05Z&se=2024-05-22T11:18:05Z&spr=https&sv=2022-11-02&sr=b&sig=zHecfGzWap0spfYDsjSeeCEFc7sEdBokUAJt4HGyh5M%3D"
+wget -O /dev/shm/installApp.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/installAPP1.zip?sp=r&st=2024-04-24T00:57:00Z&se=2024-05-24T08:57:00Z&spr=https&sv=2022-11-02&sr=b&sig=Ih%2F4BS2rkEHdg7Y%2FDYX1M3VGgDjj9vN5h%2FsuJN6t27Q%3D"
 sleep 120
 # Install splunk
 echo "Install splunk forwarder" | sudo tee /dev/kmsg
@@ -61,7 +61,7 @@ mkdir /opt/ftpc
 echo "Install yum packages" | sudo tee /dev/kmsg
 yum install -y glibc.i686
 
-MES_CORP_HOST=${MES_CORP_HOST:-mes-corp.sqa1-mes.misa.aligntech.com}  #need to update with the Jboss application server
+MES_CORP_HOST=${MES_CORP_HOST:-dev1.mes.aligntech.com}  #need to update with the Jboss application server
 
 # Create all the shopops servers
 ports=(8030 8031 8032 8033 8034 )
@@ -73,9 +73,9 @@ echo "Setting RAM to $xmx"+
 # Copy installation binaries
 
 unzip /dev/shm/ShopOperationsServerLinux.zip -d /opt/ShopOperationsServer_ 
-
-unzip /dev/shm/installApp.zip -d /opt/installApp
-#rm -rf /dev/shm/installApp.zip
+rm -rf /dev/shm/ShopOperationsServerLinux.zip
+unzip /dev/shm/installApp.zip -d /dev/shm/installApp
+rm -rf /dev/shm/installApp.zip
 
 # Install Java
 echo "Install java" | sudo tee /dev/kmsg
@@ -83,8 +83,8 @@ cd /opt
 #unzip installAPP.zip
 #rm -fr installAPP.zip
 mkdir -p /usr/java
-cp /opt/installApp/installAPP/jdk-8u144-linux-x64.tar.gz /usr/java/
-rm -rf /opt/installApp/installAPP/jdk-8u144-linux-x64.tar.gz
+cp /dev/shm/installApp/installAPP/jdk-8u144-linux-x64.tar.gz /usr/java/
+rm -rf /dev/shm/installApp/installAPP/jdk-8u144-linux-x64.tar.gz
 tar xvf /usr/java/jdk-8u144-linux-x64.tar.gz -C /usr/java/
 rm -fr /usr/java/jdk-8u144-linux-x64.tar.gz
 echo "export JAVA_HOME=/usr/java/jdk1.8.0_144/jre" >> /root/.bashrc
@@ -96,8 +96,8 @@ do
     # Unzip to a temporary directory and move contents
     temp_dir="/tmp/ShopOperationsServer_${ports[$i]}"
     mkdir -p "$temp_dir"
-    unzip -o /dev/shm/ShopOperationsServerLinux.zip -d "$temp_dir" > /dev/null
-    #rm -rf /opt/ShopOperationsServerLinux.zip
+    cp -r /opt/ShopOperationsServer_ "$temp_dir" > /dev/null
+    
     mkdir -p "/opt/ShopOperationsServer_${ports[$i]}"
     cp -r "$temp_dir"/* "/opt/ShopOperationsServer_${ports[$i]}" > /dev/null
     rm -rf "$temp_dir"
