@@ -83,8 +83,8 @@ cd /opt
 #unzip installAPP.zip
 #rm -fr installAPP.zip
 mkdir -p /usr/java
-cp /dev/shm/installApp/installAPP/jdk-8u144-linux-x64.tar.gz /usr/java/
-rm -rf /dev/shm/installApp/installAPP/jdk-8u144-linux-x64.tar.gz
+cp /dev/shm/installApp/jdk-8u144-linux-x64.tar.gz /usr/java/
+rm -rf /dev/shm/installApp/jdk-8u144-linux-x64.tar.gz
 tar xvf /usr/java/jdk-8u144-linux-x64.tar.gz -C /usr/java/
 rm -fr /usr/java/jdk-8u144-linux-x64.tar.gz
 echo "export JAVA_HOME=/usr/java/jdk1.8.0_144/jre" >> /root/.bashrc
