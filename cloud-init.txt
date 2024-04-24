@@ -6,7 +6,7 @@ lsblk -f
 sleep 5
 vgdisplay rootvg
 sleep 5
-lvresize -r -L +40G /dev/mapper/rootvg-rootlv
+lvresize -r -L +30G /dev/mapper/rootvg-rootlv
 sleep 10
 lvresize -r -L +10G /dev/mapper/rootvg-tmplv
 sleep 10
