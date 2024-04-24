@@ -4,7 +4,7 @@
 sudo su -
 wget -O /dev/shm/ShopOperationsServerLinux.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/ShopOperationsServerLinux.zip?sp=r&st=2024-04-22T20:06:10Z&se=2024-05-23T04:06:10Z&spr=https&sv=2022-11-02&sr=b&sig=mxTzGCXcIgVsgl08BQB7MJU7SqoXI0RFPzGi28X6Ius%3D"
 sleep 30
-wget -O /dev/shm/installApp.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/installAPP1.zip?sp=r&st=2024-04-24T00:57:00Z&se=2024-05-24T08:57:00Z&spr=https&sv=2022-11-02&sr=b&sig=Ih%2F4BS2rkEHdg7Y%2FDYX1M3VGgDjj9vN5h%2FsuJN6t27Q%3D"
+wget -O /dev/shm/installApp.zip "https://testmescorpstorage.blob.core.windows.net/testmescorpstoragecontainer/installApp.zip?sp=r&st=2024-04-24T01:30:28Z&se=2024-05-24T09:30:28Z&spr=https&sv=2022-11-02&sr=b&sig=WX66Vw2Se5LKYbb%2B49LzffDM2sRV9cKJ6F0vo9UMd1k%3D"
 sleep 120
 # Install splunk
 echo "Install splunk forwarder" | sudo tee /dev/kmsg
