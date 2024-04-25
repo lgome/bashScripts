@@ -107,7 +107,7 @@ do
     unzip -o /opt/ShopOperationsServerLinux.zip -d "$temp_dir" > /dev/null
     mkdir -p "/opt/ShopOperationsServer_${ports[$i]}"
     mv "$temp_dir"/* "/opt/ShopOperationsServer_${ports[$i]}" > /dev/null
-    #rm -rf "$temp_dir"
+    rm -rf "$temp_dir"
     file=/opt/ShopOperationsServer_"${ports[$i]}"/bin/ShopOperationsServer.xml
     wrapperconf=/opt/ShopOperationsServer_"${ports[$i]}"/conf/wrapper.conf
     sed -i -e s/runSos/sos-"${ports[$i]}"/ /opt/ShopOperationsServer_"${ports[$i]}"/bin/runSos.sh
