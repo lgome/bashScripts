@@ -176,7 +176,7 @@ systemctl restart jboss
 echo "Install apache ActiveMQ" | sudo tee /dev/kmsg
 
 cd /opt/ftpc10
-tar xvf /tmp/installAPP/apache-activemq-5.15.0-bin.tar
+tar xvf /tmp/installAPP/apache-activemq-5.15.16-bin.tar.gz
 
 # Apache ActiveMQ as service
 cat <<-EOF > /etc/systemd/system/activemq.service
@@ -186,9 +186,9 @@ After=syslog.target
 
 [Service]
 Type=forking
-ExecStart=/opt/ftpc10/apache-activemq-5.15.0/bin/activemq start
-ExecStop=/opt/ftpc10/apache-activemq-5.15.0/bin/activemq stop
-PIDFile=/opt/ftpc10/apache-activemq-5.15.0/data/activemq.pid
+ExecStart=/opt/ftpc10/apache-activemq-5.15.16/bin/activemq start
+ExecStop=/opt/ftpc10/apache-activemq-5.15.16/bin/activemq stop
+PIDFile=/opt/ftpc10/apache-activemq-5.15.16/data/activemq.pid
 KillMode=control-group
 Environment=JAVA_HOME=/usr/java/jdk1.8.0_144/jre
 RemainAfterExit=no
