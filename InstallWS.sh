@@ -62,6 +62,8 @@ sudo mount -t cifs //mescorpdevstorage.file.core.windows.net/installation /mnt/i
 echo "Configure Splunk..." | sudo tee /dev/kmsg
 cd /tmp
 cp /mnt/installation/BinariesforWSdeployment/* /tmp
+cp /mnt/installation/BinariesforAppLinuxServer/installAPP.zip /tmp
+cp /mnt/installation/BinariesforAppLinuxServer/splunkforwarder-8.2.5-77015bc7a462-Linux-x86_64.tgz /tmp
 sleep 2
 
 tar -xzf /tmp/splunkforwarder-8.2.5-77015bc7a462-Linux-x86_64.tgz -C /opt
