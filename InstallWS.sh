@@ -225,7 +225,7 @@ systemctl start jboss
 # Install Apache ActiveMQ
 echo "Install apache ActiveMQ" | sudo tee /dev/kmsg
 cd /opt/ftpc10
-tar xvf /tmp/installAPP/apache-activemq-5.15.16-bin.tar
+tar xvf /tmp/apache-activemq-5.15.16-bin.tar.gz
 
 # Apache ActiveMQ as service
 cat <<-EOF > /etc/systemd/system/activemq.service
@@ -295,3 +295,5 @@ yum install -y net-snmp net-snmp-utils net-snmp-devel
 sudo net-snmp-create-v3-user -ro -A snmpv3pass -X snmv3encpass -a MD5 -x DES snmpv3user
 systemctl stop snmpd.service
 systemctl start snmpd.service
+sleep 2
+umount /mnt/installation
