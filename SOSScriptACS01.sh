@@ -39,6 +39,7 @@ cp /mnt/installation/BinariesforSosLinuxServer/* /tmp
 mv /tmp/ShopOperationsServerLinux.zip /opt 
 sleep 10
 cp /mnt/installation/BinariesforAppLinuxServer/installApp.zip /opt 
+
 # Install splunk
 echo "Install splunk forwarder" | sudo tee /dev/kmsg
 cp /mnt/installation/BinariesforAppLinuxServer/splunkforwarder-9.3.0-51ccf43db5bd-Linux-x86_64.tgz /opt/splunkforwarder.tar.gz 
@@ -530,7 +531,7 @@ chattr +i /etc/resolv.conf
 
 ##########################################################SETUP SPLUNK ################################################################################################
 cp /tmp/splunkclouduf.spl /opt
-cp /mnt/installation/BinariesforAppLinuxServer/100_align_splunkcloud.zip /opt/splunkforwarder/etc/apps/cd /opt/splunkforwarder/etc/apps/
+cp /mnt/installation/BinariesforAppLinuxServer/100_align_splunkcloud.zip /opt/splunkforwarder/etc/apps/ /opt/splunkforwarder/etc/apps/
 unzip 100_align_splunkcloud.zip
 rm -fr 100_align_splunkcloud.zip
 cd /opt/splunkforwarder/bin
