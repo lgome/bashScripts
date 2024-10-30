@@ -194,131 +194,7 @@ WantedBy=multi-user.target
 EOF
 ##########################################################create splunk service##################################################################
 
-###########################################################CREATE SCRIPT FOR SINGLE SOS INSTANCE CREATION####################################################################################
 
-cat <<-EOF > /usr/local/bin/SOScreation-Single.sh
-#!/bin/bash
-#
-missingParameters()
-{
-   echo "Usage:"
-   echo -e "\t-p sos port number"
-   echo -e "\t-e eventsheet name"
-   echo -e "\t-a application name"
-   echo -e "\t-s station name"
-   echo -e "\t-m totalSOS"
-   exit 1 # Exit script after printing help
-}
-
-#Get bash parameters
-while getopts "p:e:a:s:m:" opt
-do
-   case "$opt" in
-      p ) port="$OPTARG" ;;
-          e ) eventSheet="$OPTARG" ;;
-          a ) LBapp="$OPTARG" ;;
-          s ) station="$OPTARG" ;;
-      m ) totalports="$OPTARG" ;;
-      ? ) missingParameters ;;
-   esac
-done
-# Print missingParameters in case parameters are empty
-if [ -z "$port" ]
-then
-   echo "Missing port parameter";
-   missingParameters
-fi
-
-if [ -z "$eventSheet" ]
-then
-   echo "Missing event sheet parameter";
-   missingParameters
-fi
-if [ -z "$LBapp" ]
-then
-   echo "Missing LBapp parameter";
-   missingParameters
-fi
-
-
-if [ -z "$station" ]
-then
-   echo "Missing station parameter";
-   missingParameters
-fi
-
-if [ -z "$totalports" ]
-then
-   echo "Num Total SOS";
-   missingParameters
-fi
-
-
-MES_CORP_HOST=$LBapp
-#MES_CORP_HOST=${MES_CORP_HOST:-mes.qat.aligntech.com}
-#Create all the shopops servers
-ports=$port
-stations=$station
-eventsheets=($eventSheet)
-xmx=$(( $(/bin/free -m | grep Mem | awk '{print $2}')/$totalports ))
-echo "Setting RAM to $xmx"
-
-for i in `seq 0 $(( ${#ports[@]} - 1 ))`;
-do
-            cd /opt
-                file=/opt/ShopOps_${eventsheets[$i]}_${ports[$i]}/bin/ShopOperationsServer.xml
-                wrapperconf=/opt/ShopOps_${eventsheets[$i]}_${ports[$i]}/conf/wrapper.conf
-                cp -r /opt/ShopOperationsServer_  /opt/ShopOps_${eventsheets[$i]}_${ports[$i]}
-                 #unzip -o ShopOperationsServerLinux.zip -d /opt/ShopOps_${eventsheets[$i]}_${ports[$i]} > /dev/null
-                sed -i -e s/runSos/sos-${ports[$i]}/ /opt/ShopOps_${eventsheets[$i]}_${ports[$i]}/bin/runSos.sh
-                sed -i -e s/Rockwell\ Shop\ Operations\ Server/${eventsheets[$i]}/ /opt/ShopOps_${eventsheets[$i]}_${ports[$i]}/bin/runSos.sh
-                sed -i -e s/8084/${ports[$i]}/ $file
-                sed -i -e "s,\(</shop-operations-server-configuration>\),<station>${stations[$i]}</station>\1," $file
-                sed -i -e "s,\(</shop-operations-server-configuration>\),<event-sheet-name>${eventsheets[$i]}</event-sheet-name>\1," $file
-                sed -i -e "s,\(</shop-operations-server-configuration>\),<log-folder>/opt/ShopOps_${eventsheets[$i]}_${ports[$i]}/bin/logs</log-folder>\1," $file
-                #wrapperconf = /opt/ShopOperationsServer_"${ports[$i]}"/conf/wrapper.conf
-                cd /opt/ShopOps_${eventsheets[$i]}_${ports[$i]} && \
-                chmod 755 bin/configSosEnv.sh bin/runSos.sh bin/wrapper && \
-                sed -i -e "s/@@IIOP_URL@@/remote:\/\/${MES_CORP_HOST}:8080/" $file && \
-                sed -i -e "s/@@HTTP_URL@@/http:\/\/${MES_CORP_HOST}:8080/" $file && \
-                #cp /opt/wrapper.conf /opt/ShopOps_${eventsheets[$i]}_${ports[$i]}/conf/wrapper.conf
-                sed -i -e "s/Xmx512m/Xmx${xmx}m/" $wrapperconf && \
-                rm -rf /opt/ShopOps_${eventsheets[$i]}_${ports[$i]}/lib/activemq-all-5.15.0.jar
-                rm -rf /opt/ShopOps_${eventsheets[$i]}_${ports[$i]}/lib/slf4j-api-1.7.21.jar
-                rm -rf /opt/ShopOps_${eventsheets[$i]}_${ports[$i]}/lib/slf4j-log4j12-1.7.15.jar
-                cd /opt/ShopOps_${eventsheets[$i]}_${ports[$i]}/bin
-                sed -i -e 's/\r$//' runSos.sh
-                echo "before cat line service"
-                cd /opt
-cat <<-EOF > /etc/systemd/system/sos-${ports[$i]}.service
-[Unit]
-Description=${eventsheets[$i]}
-After=syslog.target
-
-[Service]
-Type=forking
-ExecStart=/opt/ShopOps_${eventsheets[$i]}_${ports[$i]}/bin/./runSos.sh start
-ExecStop=/opt/ShopOps_${eventsheets[$i]}_${ports[$i]}/bin/./runSos.sh stop
-KillMode=control-group
-Environment=SYSTEMD_KILLMODE_WARNING=true
-Environment=JAVA_HOME=/usr/lib/jvm/java
-RemainAfterExit=no
-Restart=always
-RestartSec=5s
-PIDFile=/opt/ShopOps_${eventsheets[$i]}_${ports[$i]}/bin/../bin/sos-${ports[$i]}.pid
-
-[Install]
-WantedBy=multi-user.target
-
-EOF
-echo 'wrapper.java.classpath.6=../bin/logs/jars/ShopOpsServer/log4j-slf4j-impl.jar'>> /opt/ShopOps_${eventsheets[$i]}_${ports[$i]}/conf/wrapper.conf
-chkconfig sos-${ports[$i]} on
-
-done
-
-EOF
-
-###########################################################CREATE SCRIPT FOR SINGLE SOS INSTANCE CREATION########################################################################################
 
 echo "Start sos" | sudo tee /dev/kmsg
 
@@ -416,7 +292,7 @@ LOG_FILES=("wrapper.log" "AcsIntegration.log" "MESEventPublisherSOS.log" "MESEve
 for folder in "$ROOT_FOLDER"/ShopOps_*; do
     
     # Extract the port number from the folder name if the version is ShopOps_ use this one
-    port=$(basename "$folder" | sed sed 's/[^0-9]//g')
+    port=$(basename "$folder" | sed 's/[^0-9]//g')
     
     # Log the directory being processed
     echo "[$(date)] Processing directory: $folder" >> "$LOG_FILE_PATH"
@@ -491,7 +367,7 @@ EOF
 sleep 5
 
 ##########################################################CREATE SYSTEMD TIMER UNIT FILE FOR THE WATCHDOG##################################################################
-CAT <<-EOF > /etc/systemd/system/watchdogv2.timer
+cat <<-EOF > /etc/systemd/system/watchdogv2.timer
 [Unit]
 Description=watchdog service timer
 
