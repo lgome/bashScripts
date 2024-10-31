@@ -1,6 +1,5 @@
 #!/bin/bash
-#sudo yum install -y java
-#sudo yum install -y mysql-server
+
 sudo su -
 lsblk -f
 sleep 5
@@ -40,8 +39,10 @@ cp /mnt/installation/BinariesforSosLinuxServer/* /tmp
 mv /tmp/ShopOperationsServerLinux.zip /opt 
 sleep 10
 cp /mnt/installation/BinariesforAppLinuxServer/installApp.zip /opt 
-# Install splunk
-echo "Install splunk forwarder" | sudo tee /dev/kmsg
+
+
+##################################################################### INSTALL SPLUNk ################################################################################################
+echo "INSTALL SPLUNk forwarder" | sudo tee /dev/kmsg
 cp /mnt/installation/BinariesforAppLinuxServer/splunkforwarder-9.3.0-51ccf43db5bd-Linux-x86_64.tgz /opt/splunkforwarder.tar.gz 
 tar -xzf /opt/splunkforwarder.tar.gz -C /opt
 rm -rf /opt/splunkforwarder.tar.gz
@@ -64,6 +65,9 @@ sourcetype = mescorp:sos
 index = $SPLUNK_INDEX
 sourcetype = mescorp:sos
 EOF
+##################################################################### INSTALL SPLUNk ################################################################################################
+
+
 
 mkdir /opt/ftpc
 echo "Install yum packages" | sudo tee /dev/kmsg
@@ -72,6 +76,7 @@ unzip /opt/ShopOperationsServerLinux.zip -d /opt/ShopOperationsServer_
 #rm -rf /opt/ShopOperationsServerLinux.zip
 unzip /opt/installApp.zip -d /opt/installApp
 
+##################################################################### INSTALL JAVA ################################################################################################
 mkdir -p /usr/java
 cp /opt/installApp/installAPP/jdk-8u144-linux-x64.tar.gz /usr/java/
 rm -rf /opt/installApp/installAPP/jdk-8u144-linux-x64.tar.gz
@@ -80,7 +85,10 @@ rm -fr /usr/java/jdk-8u144-linux-x64.tar.gz
 # Appending Java environment variables to /root/.bashrc
 echo "export JAVA_HOME=/usr/java/jdk1.8.0_144" >> /root/.bashrc
 echo "export PATH=$JAVA_HOME/bin:$PATH" >> /root/.bashrc
+##################################################################### INSTALL JAVA ################################################################################################
 
+
+##################################################################### CREATE SHOPOPS SERVERS ################################################################################################
 MES_CORP_HOST=${MES_CORP_HOST:-mes.prd-azr.aligntech.com}  #need to update with the Jboss application server
 
 # Create all the shopops servers
@@ -137,19 +145,69 @@ PIDFile=/opt/ShopOps_${eventsheets[$i]}_${ports[$i]}/bin/../bin/sos-${ports[$i]}
 WantedBy=multi-user.target
 
 EOF
-sed -i -e 's/\r$//' /opt/ShopOps_${eventsheets[$i]}_${ports[$i]}/conf/wrapper.conf
-chkconfig sos-${ports[$i]} on
 
+#LINE 119 ALREADY DO THIS  sed -i -e 's/\r$//' /opt/ShopOps_${eventsheets[$i]}_${ports[$i]}/conf/wrapper.conf
+chkconfig sos-${ports[$i]} on
 done
 
-##Add wrapper entries
+echo 'wrapper.java.additional.10=-Dlogfile.name=../logs/ScanSegResponse.log' >> /opt/ShopOps*_8205/conf/wrapper.conf
+echo 'wrapper.java.additional.11=-DjsonLogfile.name=../logs/ScanSegResponse.json' >> /opt/ShopOps*_8205/conf/wrapper.conf
+##################################################################### CREATE SHOPOPS SERVERS ################################################################################################
 
-echo 'wrapper.java.additional.10=-Dlogfile.name=../logs/ScanSegResponse.log' >> /opt/ShopOps_AT_SMARTDDT_ScanSegResp_8205/conf/wrapper.conf
-echo 'wrapper.java.additional.11=-DjsonLogfile.name=../logs/ScanSegResponse.json' >> /opt/ShopOps_AT_SMARTDDT_ScanSegResp_8205/conf/wrapper.conf
+##########################################################ADD ACTIVEMQ JAR TO MES EVENT PUBLISHER SOS /lib FOLDER##################################################################
+DIR=/opt/ShopOps_AT_MESEventPublisher_8034/lib
 
-# Add the new classpath to the wrapper config
+if [ -d "$DIR" ]; then
+echo "Directory exists." >> /tmp/installationprocess.log
+cp /tmp/activemq-all-5.15.0.jar /opt/ShopOps_AT_MESEventPublisher_8034/lib
+else
+echo "Directory doesn't exist." >> /tmp/installationprocess.log
+fi
+##########################################################ADD ACTIVEMQ JAR TO MES EVENT PUBLISHER SOS /lib FOLDER##################################################################
 
 
+##############################################################################################Add wrapper entries###########################################################################
+
+echo 'wrapper.java.additional.10=-Dlogfile.name=../logs/AcsIntegration.log' >> /opt/ShopOps_ACS_TreatUpload_8033/conf/wrapper.conf
+echo 'wrapper.java.additional.11=-DjsonLogfile.name=../logs/AcsIntegration.json' >> /opt/ShopOps_ACS_TreatUpload_8033/conf/wrapper.conf
+
+systemctl daemon-reload
+##############################################################################################Add wrapper entries###########################################################################
+
+
+
+##########################################################create splunk service##################################################################
+cat <<EOF > /etc/systemd/system/splunk.service
+
+[Unit]
+Description=Systemd service file for Splunk, generated by 'splunk enable boot-start'
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+Restart=always
+ExecStart=/opt/splunkforwarder/bin/splunk _internal_launch_under_systemd
+KillMode=mixed
+KillSignal=SIGINT
+TimeoutStopSec=360
+LimitNOFILE=65536
+LimitRTPRIO=99
+SuccessExitStatus=51 52
+RestartPreventExitStatus=51
+RestartForceExitStatus=52
+User=root
+Group=root
+NoNewPrivileges=yes
+PermissionsStartOnly=true
+AmbientCapabilities=CAP_DAC_READ_SEARCH
+ExecStartPre=-/bin/bash -c "chown -R root:root /opt/splunkforwarder"
+
+[Install]
+WantedBy=multi-user.target
+
+EOF
+##########################################################create splunk service##################################################################
 
 
 
@@ -161,7 +219,7 @@ do
     sudo systemctl start sos-"${ports[$i]}".service
 done
 
-# Create script to manage all instances
+########################################################################## Create script to manage all instances ############################################################
 echo "Start sos bash script" | sudo tee /dev/kmsg
 cat <<EOF > /usr/local/bin/sos.sh
 #!/bin/bash
@@ -175,6 +233,9 @@ done
 EOF
 
 chmod +x /usr/local/bin/sos.sh
+########################################################################## Create script to manage all instances ############################################################
+
+
 
 ##########################################################CREATE WATCHDOG SCRIPT##################################################################################
 sudo cat <<EOF > /usr/local/bin/watchdogv2.sh
@@ -248,157 +309,40 @@ EOF
 ##########################################################CREATE WATCHDOG SCRIPT################################################################################## 
 
 
-###########################################################CREATE SCRIPT FOR SINGLE SOS INSTANCE CREATION####################################################################################
-
-cat <<-EOF > /usr/local/bin/SOScreation-Single.sh
-#!/bin/bash
-#
-missingParameters()
-{
-   echo "Usage:"
-   echo -e "\t-p sos port number"
-   echo -e "\t-e eventsheet name"
-   echo -e "\t-a application name"
-   echo -e "\t-s station name"
-   echo -e "\t-m totalSOS"
-   exit 1 # Exit script after printing help
-}
-
-#Get bash parameters
-while getopts "p:e:a:s:m:" opt
-do
-   case "$opt" in
-      p ) port="$OPTARG" ;;
-          e ) eventSheet="$OPTARG" ;;
-          a ) LBapp="$OPTARG" ;;
-          s ) station="$OPTARG" ;;
-      m ) totalports="$OPTARG" ;;
-      ? ) missingParameters ;;
-   esac
-done
-# Print missingParameters in case parameters are empty
-if [ -z "$port" ]
-then
-   echo "Missing port parameter";
-   missingParameters
-fi
-
-if [ -z "$eventSheet" ]
-then
-   echo "Missing event sheet parameter";
-   missingParameters
-fi
-if [ -z "$LBapp" ]
-then
-   echo "Missing LBapp parameter";
-   missingParameters
-fi
-
-
-if [ -z "$station" ]
-then
-   echo "Missing station parameter";
-   missingParameters
-fi
-
-if [ -z "$totalports" ]
-then
-   echo "Num Total SOS";
-   missingParameters
-fi
-
-
-MES_CORP_HOST=$LBapp
-#MES_CORP_HOST=${MES_CORP_HOST:-mes.qat.aligntech.com}
-#Create all the shopops servers
-ports=$port
-stations=$station
-eventsheets=($eventSheet)
-xmx=$(( $(/bin/free -m | grep Mem | awk '{print $2}')/$totalports ))
-echo "Setting RAM to $xmx"
-
-for i in `seq 0 $(( ${#ports[@]} - 1 ))`;
-do
-            cd /opt
-                file=/opt/ShopOps_${eventsheets[$i]}_${ports[$i]}/bin/ShopOperationsServer.xml
-                wrapperconf=/opt/ShopOps_${eventsheets[$i]}_${ports[$i]}/conf/wrapper.conf
-                cp -r /opt/ShopOperationsServer_  /opt/ShopOps_${eventsheets[$i]}_${ports[$i]}
-                 #unzip -o ShopOperationsServerLinux.zip -d /opt/ShopOps_${eventsheets[$i]}_${ports[$i]} > /dev/null
-                sed -i -e s/runSos/sos-${ports[$i]}/ /opt/ShopOps_${eventsheets[$i]}_${ports[$i]}/bin/runSos.sh
-                sed -i -e s/Rockwell\ Shop\ Operations\ Server/${eventsheets[$i]}/ /opt/ShopOps_${eventsheets[$i]}_${ports[$i]}/bin/runSos.sh
-                sed -i -e s/8084/${ports[$i]}/ $file
-                sed -i -e "s,\(</shop-operations-server-configuration>\),<station>${stations[$i]}</station>\1," $file
-                sed -i -e "s,\(</shop-operations-server-configuration>\),<event-sheet-name>${eventsheets[$i]}</event-sheet-name>\1," $file
-                sed -i -e "s,\(</shop-operations-server-configuration>\),<log-folder>/opt/ShopOps_${eventsheets[$i]}_${ports[$i]}/bin/logs</log-folder>\1," $file
-                #wrapperconf = /opt/ShopOperationsServer_"${ports[$i]}"/conf/wrapper.conf
-                cd /opt/ShopOps_${eventsheets[$i]}_${ports[$i]} && \
-                chmod 755 bin/configSosEnv.sh bin/runSos.sh bin/wrapper && \
-                sed -i -e "s/@@IIOP_URL@@/remote:\/\/${MES_CORP_HOST}:8080/" $file && \
-                sed -i -e "s/@@HTTP_URL@@/http:\/\/${MES_CORP_HOST}:8080/" $file && \
-                #cp /opt/wrapper.conf /opt/ShopOps_${eventsheets[$i]}_${ports[$i]}/conf/wrapper.conf
-                sed -i -e "s/Xmx512m/Xmx${xmx}m/" $wrapperconf && \
-                rm -rf /opt/ShopOps_${eventsheets[$i]}_${ports[$i]}/lib/activemq-all-5.15.0.jar
-                rm -rf /opt/ShopOps_${eventsheets[$i]}_${ports[$i]}/lib/slf4j-api-1.7.21.jar
-                rm -rf /opt/ShopOps_${eventsheets[$i]}_${ports[$i]}/lib/slf4j-log4j12-1.7.15.jar
-                cd /opt/ShopOps_${eventsheets[$i]}_${ports[$i]}/bin
-                sed -i -e 's/\r$//' runSos.sh
-                echo "before cat line service"
-                cd /opt
-cat <<-EOF > /etc/systemd/system/sos-${ports[$i]}.service
-[Unit]
-Description=${eventsheets[$i]}
-After=syslog.target
-
-[Service]
-Type=forking
-ExecStart=/opt/ShopOps_${eventsheets[$i]}_${ports[$i]}/bin/./runSos.sh start
-ExecStop=/opt/ShopOps_${eventsheets[$i]}_${ports[$i]}/bin/./runSos.sh stop
-KillMode=control-group
-Environment=SYSTEMD_KILLMODE_WARNING=true
-Environment=JAVA_HOME=/usr/lib/jvm/java
-RemainAfterExit=no
-Restart=always
-RestartSec=5s
-PIDFile=/opt/ShopOps_${eventsheets[$i]}_${ports[$i]}/bin/../bin/sos-${ports[$i]}.pid
-
-[Install]
-WantedBy=multi-user.target
-
-EOF
-echo 'wrapper.java.classpath.6=../bin/logs/jars/ShopOpsServer/log4j-slf4j-impl.jar'>> /opt/ShopOps_${eventsheets[$i]}_${ports[$i]}/conf/wrapper.conf
-chkconfig sos-${ports[$i]} on
-
-done
-
-EOF
-
-###########################################################CREATE SCRIPT FOR SINGLE SOS INSTANCE CREATION########################################################################################
-
-
 echo "Start SOS watchdog" | sudo tee /dev/kmsg
 chmod +x /usr/local/bin/watchdogv2.sh
 
 # Reload all the startup scripts
 systemctl daemon-reload
 
+# Enable watchdog service
 
-sudo iptables -A INPUT -p udp --dport 161 -j ACCEPT
+iptables -A INPUT -p udp --dport 161 -j ACCEPT
 sudo firewall-cmd --permanent --add-port=161/udp
-sudo iptables -A INPUT -p udp --dport 162 -j ACCEPT
-sudo firewall-cmd --permanent --add-port=162/udp
-sudo iptables -A OUTPUT -p tcp --dport 8089 -j ACCEPT
-sudo firewall-cmd --permanent --add-port=8089/tcp
-sudo iptables -A OUTPUT -p tcp --dport 9997 -j ACCEPT
-sudo firewall-cmd --permanent --add-port=9997/tcp
-sudo iptables-save
-sudo firewall-cmd --reload
+iptables -A INPUT -p udp --dport 162 -j ACCEPT
+firewall-cmd --permanent --add-port=162/udp
+iptables -A OUTPUT -p tcp --dport 8089 -j ACCEPT
+firewall-cmd --permanent --add-port=8089/tcp
+iptables -A OUTPUT -p tcp --dport 9997 -j ACCEPT
+firewall-cmd --permanent --add-port=9997/tcp
+iptables-save
+firewall-cmd --reload
 
 ##########################################################OPEN PORTS FROM FIREWALL##################################################################
 for i in 608{2..8} 803{0..8} 804{0..2} 8045 80{6,7,9}0 808{4..8} 809{0..8} 812{0,5} 813{4..6} 820{0..2} 8210 822{0,1,5} 823{0,5} 824{0..9} 825{0,5} 826{0,5} 827{0,5,6} 828{0,1,5} 161 162
 do 
 firewall-cmd --permanent --add-port=${i}/tcp
 done
-sudo firewall-cmd --reload
+iptables -A INPUT -p udp --dport 161 -j ACCEPT
+sudo firewall-cmd --permanent --add-port=161/udp
+iptables -A INPUT -p udp --dport 162 -j ACCEPT
+firewall-cmd --permanent --add-port=162/udp
+iptables -A OUTPUT -p tcp --dport 8089 -j ACCEPT
+firewall-cmd --permanent --add-port=8089/tcp
+iptables -A OUTPUT -p tcp --dport 9997 -j ACCEPT
+firewall-cmd --permanent --add-port=9997/tcp
+iptables-save
+firewall-cmd --reload
 
 ##########################################################CHANGE USER FROM ADMIN TO APPDude##################################################################
 for i in ShopOps_*
@@ -406,11 +350,9 @@ do
 sed -i 's/admin/appdude/g' /opt/${i}/bin/ShopOperationsServer.xml
 sed -i 's/ozew#/Gikbdn4N/g' /opt/${i}/bin/ShopOperationsServer.xml
 done
+##########################################################CHANGE USER FROM ADMIN TO APPDude##################################################################
 
-
-
-##########################################################CREATE SERVICE FILE FOR THE WATCHDOG##################################################################
-
+###########################################################CREATE SYSTEMD SERVICE FILE FOR THE WATCHDOG####################################################################
 cat <<-EOF > /etc/systemd/system/watchdogv2.service
 [Unit]
 Description=SOS Watchdog Service
@@ -422,6 +364,10 @@ ExecStart=/usr/local/bin/watchdogv2.sh
 [Install]
 WantedBy=multi-user.target
 EOF
+###########################################################CREATE SYSTEMD SERVICE FILE FOR THE WATCHDOG####################################################################
+
+
+
 
 ##########################################################CREATE SYSTEMD TIMER UNIT FILE FOR THE WATCHDOG##################################################################
 cat <<-EOF > /etc/systemd/system/watchdogv2.timer
@@ -464,6 +410,7 @@ systemctl restart splunk
 yum install -y net-snmp net-snmp-utils net-snmp-devel
 sudo net-snmp-create-v3-user -ro -A snmpv3pass -X snmv3encpass -a MD5 -x DES snmpv3user
 systemctl stop snmpd.service
+systemctl enable snmpd.service
 systemctl start snmpd.service
 #rm -fr /tmp/*
 
@@ -476,10 +423,10 @@ sleep 10
 ##########################################################Setup Microsoft Defender for Endpoint####################################################################
 systemctl start mdatp
 sleep 15
-cp /mnt/installation/MES_SOS_Exclusions.json opt/microsoft/mdatp/conf
-mdatp exclusion file add --path opt/microsoft/mdatp/conf/MES_SOS_Exclusions.json --scope global
+cp /mnt/installation/MES_SOS_Exclusions.json /opt/microsoft/mdatp/conf
+mdatp exclusion file add --path /opt/microsoft/mdatp/conf/MES_SOS_Exclusions.json --scope global
 systemctl restart mdatp
-
+umount /mnt/installation
 
 sudo yum -y install sysstat
 sudo rpm -Uvh https://packages.microsoft.com/config/rhel/8/packages-microsoft-prod.rpm
