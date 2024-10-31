@@ -35,6 +35,8 @@ systemctl daemon-reload
 sudo mount -t cifs //mescorpdevstorage.file.core.windows.net/installation /mnt/installation -o credentials=/etc/smbcredentials/mescorpdevstorage.cred,dir_mode=0777,file_mode=0777,serverino,nosharesock,actimeo=30
 
 cp /mnt/installation/BinariesforSosLinuxServer/* /tmp
+mv /tmp/*.sh /usr/local/bin
+chmod +x /usr/local/bin/*.sh
 cp /tmp/wrapper.conf /opt/
 mv /tmp/ShopOperationsServerLinux.zip /opt 
 sleep 10
