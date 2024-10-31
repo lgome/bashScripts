@@ -96,7 +96,7 @@ MES_CORP_HOST=${MES_CORP_HOST:-mes.prd-azr.aligntech.com}  #need to update with 
 # Create all the shopops servers
 ports=(6082 6083 6084 6085 6086 6087 6088 6089 8085 8086 8087 8088 8205)
 stations=(Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1 Admin1)
-eventsheets=(AT_SMARTDDT_ScanSegReq12 AT_SMARTDDT_ScanSegReq11 AT_SMARTDDT_ScanSegReq10 AT_SMARTDDT_ScanSegReq9 AT_SMARTDDT_ScanSegReq8 AT_SMARTDDT_ScanSegReq7 AT_SMARTDDT_ScanSegReq6 AT_SMARTDDT_ScanSegReq AT_SMARTDDT_ScanSegReq2 AT_SMARTDDT_ScanSegReq3 AT_SMARTDDT_ScanSegReq4 AT_SMARTDDT_ScanSegReq5)
+eventsheets=(AT_SMARTDDT_ScanSegReq12 AT_SMARTDDT_ScanSegReq11 AT_SMARTDDT_ScanSegReq10 AT_SMARTDDT_ScanSegReq9 AT_SMARTDDT_ScanSegReq8 AT_SMARTDDT_ScanSegReq7 AT_SMARTDDT_ScanSegReq6 AT_SMARTDDT_ScanSegReq AT_SMARTDDT_ScanSegReq2 AT_SMARTDDT_ScanSegReq3 AT_SMARTDDT_ScanSegReq4 AT_SMARTDDT_ScanSegReq5 AT_SMARTDDT_ScanSegResp)
 xmx=$(( $(/bin/free -m | grep Mem | awk '{print $2}')/${#ports[@]} ))
 echo "Setting RAM to $xmx"
 
