@@ -35,6 +35,8 @@ systemctl daemon-reload
 sudo mount -t cifs //mescorpdevstorage.file.core.windows.net/installation /mnt/installation -o credentials=/etc/smbcredentials/mescorpdevstorage.cred,dir_mode=0777,file_mode=0777,serverino,nosharesock,actimeo=30
 
 cp /mnt/installation/BinariesforSosLinuxServer/* /tmp
+mv /tmp/*.sh /usr/local/bin
+chmod +x /usr/local/bin/*.sh
 cp /tmp/wrapper.conf /opt/
 mv /tmp/ShopOperationsServerLinux.zip /opt 
 sleep 10
@@ -205,7 +207,7 @@ sudo iptables-save
 sudo firewall-cmd --reload
 
 ##########################################################OPEN PORTS FROM FIREWALL##################################################################
-for i in 608{2..8} 803{0..8} 804{0..2} 8045 80{6,7,9}0 808{4..8} 809{0..8} 812{0,5} 813{4..6} 820{0..2} 8210 822{0,1,5} 823{0,5} 824{0..9} 825{0,5} 826{0,5} 827{0,5,6} 828{0,1,5} 161 162
+for i in 608{2..8} 803{0..8} 804{0..9} 80{5,6,7,9}0 8065 8078 808{4..8} 809{0..8} 812{0,5} 813{4..6} 820{0..2} 8210 8215 822{0,1,5} 823{0,9} 824{0..9} 825{0,5} 826{0,5} 827{0..9} 828{0,1,5} 161 162
 do 
 firewall-cmd --permanent --add-port=${i}/tcp
 done
